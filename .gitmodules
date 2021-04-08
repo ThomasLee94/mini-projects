@@ -1,0 +1,3 @@
+[submodule "minesweeper-solver"]
+	path = minesweeper-solver
+	url = https://github.com/ThomasLee94/minesweeper-solver.git
