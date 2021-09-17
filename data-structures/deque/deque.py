@@ -13,7 +13,6 @@ class Deque(DoublyLinkedList):
         s = ""
 
         for i in range(len(items)):
-            print("i: ", i)
             if i == 0:
                 s += f'HEAD {items[i]} <--> '
             elif i == len(items)-1:
@@ -40,21 +39,11 @@ class Deque(DoublyLinkedList):
 
         return node.val
 
-    def append(self, val):
-        self.append(val)
-
-    def prepend(self, val):
-        self.prepend(val)
-
     def pop(self):
-        node = self.remove(self.tail)
-
-        return node.val
+        return self.remove(self.tail)
 
     def popleft(self):
-        node = self.remove(self.head)
-
-        return node.val
+        return self.remove(self.head)
 
     def extend(self, iterable):
         for val in iterable:
