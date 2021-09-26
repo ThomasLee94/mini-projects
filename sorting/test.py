@@ -1,8 +1,7 @@
 from is_sorted import is_sorted
 from merge import merge_sort
 from quick import quick_sort, random_partition, \
-    median_partition, bfort_partition, first_partition, \
-    median_random_partition, last_partition
+    bfort_partition, first_partition, last_partition
 
 
 def test_is_sorted():
@@ -26,11 +25,9 @@ def test_merge_sort(nums):
 # quick sort start =========================================
 def test_quick_sort(nums):
     test_first_parition(nums)
-    # test_last_parition(nums)
+    test_last_parition(nums)
     test_random_partition(nums)
-    # test_median_partition(nums)
-    # test_median_random_partition(nums)
-    # test_bfort_partition(nums)
+    test_bfort_partition()
 
 
 def test_first_parition(nums):
@@ -48,17 +45,8 @@ def test_random_partition(nums):
     assert is_sorted(nums) is True
 
 
-def test_median_partition(nums):
-    quick_sort(nums, median_partition)
-    assert is_sorted(nums) is True
-
-
-def test_median_random_partition(nums):
-    quick_sort(nums, median_random_partition)
-    assert is_sorted(nums) is True
-
-
-def test_bfort_partition(nums):
+def test_bfort_partition():
+    nums = [20, 5, 6, 1, 19, 17, 8, 4, 11, 12, 9, 2, 13]
     quick_sort(nums, bfort_partition)
     assert is_sorted(nums) is True
 # quick sort end ===========================================
