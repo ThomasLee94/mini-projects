@@ -1,6 +1,6 @@
-from is_sorted import is_sorted
+from util import is_sorted, unsort
 from merge import merge_sort
-from quick import quick_sort, random_partition, \
+from quick import median_of_three_partition, quick_sort, random_partition, \
     bfort_partition, first_partition, last_partition
 
 
@@ -17,7 +17,13 @@ def test_is_sorted():
     assert is_sorted(unsorted_nums_descending, True) is False
 
 
+def test_unsorted(nums):
+    unsort(nums)
+    assert is_sorted(nums) is False
+
+
 def test_merge_sort(nums):
+    unsort(nums)
     merged_nums = merge_sort(nums)
     assert is_sorted(merged_nums) is True
 
@@ -27,21 +33,31 @@ def test_quick_sort(nums):
     test_first_parition(nums)
     test_last_parition(nums)
     test_random_partition(nums)
+    test_median_of_three_partition(nums)
     test_bfort_partition()
 
 
 def test_first_parition(nums):
+    unsort(nums)
     quick_sort(nums, first_partition)
     assert is_sorted(nums) is True
 
 
 def test_last_parition(nums):
+    unsort(nums)
     quick_sort(nums, last_partition)
     assert is_sorted(nums) is True
 
 
 def test_random_partition(nums):
+    unsort(nums)
     quick_sort(nums, random_partition)
+    assert is_sorted(nums) is True
+
+
+def test_median_of_three_partition(nums):
+    unsort(nums)
+    quick_sort(nums, median_of_three_partition)
     assert is_sorted(nums) is True
 
 
