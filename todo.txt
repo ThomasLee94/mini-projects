@@ -1,3 +1,0 @@
-1) you can init a set like a = set() or a = {}. You can add to either by doing a.add(item). How does python knowing the difference between a dictionary and a set?
-2) Implement a deque so u can index them an iterate over it.
-3) 
