@@ -31,76 +31,96 @@ literature on fibonacci heaps/priority queues.
 class Node:
     def __init__(self, val):
         self.val = val
+        self.parent = None
         self.children = {}
+        self.loser = False
         self.degrees = len(self.children)
 
-    def add_child(self, val):
-        if val not in self.children:
-            self.children[val] = Node(val)
-
-
-class KTreeHeap:
-    def __init__(self, iterable=None):
-        self.root = None
-
-        if iterable:
-            for item in iterable:
-                self.add_node(item)
-
-    def add_node(self, val):
-        if self.root is None:
-            self.root = Node(val)
-        else:
-            parent = self.get_parent(self.root, val)
-
-            pass
+    def add_child(self, child_node):
+        if child_node.val not in self.children:
+            self.children[child_node.val] = child_node
 
 
 class FibHeap:
-    def __init__(self, iterables=None):
-        self.roots = []
-        self.node_map = {}
+    def __init__(self, iterable=None):
+        self.roots = {}  # map of all root nodes
+        self.node_map = {}  # map of all nodes
         self.min_root = None
 
-        if iterables:
-            for iterable in iterables:
-                self.add_tree(iterable)
+        if iterable:
+            for item in iterable:
+                self.push(item)
 
-    def heappop(self):
-        # dereference child pointers of min_root & promote them
+    def pop(self):
+        # TODO: Why can we only clean up roots with the same degrees?
+        # This is avoid a heap-tree structure that is shallow and wide.
+
+        # dereference child pointers of min_root & promote orphans
         if self.min_root is not None:
             min_val = self.min_root.val
 
             for child_key in self.min_root.keys():
+                # mark promoted orphans an non losers
+                self.min_root[child_key].loser = False
                 self.roots.append(self.min_root[child_key])
+                # dereference pointers to all children
                 del self.min_root[child_key]
 
-            self.clean()  # merge roots with the same degrees
+            del self.node_map[self.min_root.val]  # del min root node
+            self._clean()  # merge roots with the same degrees
+            self._update_min_root()  # find new min root
             return min_val  # return min val in fib heap
         else:
             raise AssertionError
 
-    def heappush(self, val):
+    def push(self, val):
         new_node = Node(val)
-        self.roots.append(new_node)
+        self.roots[new_node.val] = new_node
         self.node_map[val] = new_node
 
         # update min root if necessary
         if val < self.min_root.val:
             self.min_root = new_node
 
-    def heapreplace(self, new_val, old_val):
+    def replace(self, new_val, old_val):
         """This is a log n operation. """
+        # get node
+        replace_node = self.node_map[old_val]
+        # update the val
+        replace_node.val = new_val
+        # check if there is a heap violation
+        if self._is_violated:
+            # if there is, remove the child and append it as a new root
+            parent = replace_node.parent
+            del parent[replace_node.val]
+            self.roots[replace_node.val] = replace_node
+
+    def merge(self, node1, node2):
+        if node1.val < node2.val:
+            node2.add_child(node1)
+        else:
+            node1.add_child(node2)
+
+    def _is_violated(self):
         pass
 
-    def clean(self):
+    def _update_min_root(self):
+        min_val = float("inf")
+
+        for root in self.roots.values():
+            min_val = min(min_val, root.val)
+
+        self.min_root = self.node_map[min_val]
+
+    def _clean(self):
         """merge root nodes with the same degree. Order of degree's is
         arbitrary, we will be going from left to right"""
 
-        left_root, right_root = 0, len(self.roots)
-        while left_root.degrees == right_root.degrees:
-            self.merge(left_root, right_root)
-            right_root += 1
+        if left == len(self.roots)-1:
+            return
 
-    def merge(self, node1, node2):
-        pass
+        for root_node in self.roots.values():
+            for other_root in self.roots.values():
+                if root_node.degrees == other_root.degrees and root_node != other_root:
+                    self.merge(root_node, other_root)
+                    self._clean()
