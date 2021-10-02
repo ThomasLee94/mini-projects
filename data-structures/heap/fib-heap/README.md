@@ -13,7 +13,7 @@ only cleanup in batches (as opposed to every pop with binary heaps)
 - We are lazy with pushes and simply add new nodes as a root node
 <br></br>
 
-![](images/push.png?raw=true)
+![2](images/push.png)
 <br></br>
 
 ```python
@@ -32,7 +32,7 @@ def push(key):
 
 <br></br>
 
-![](images/pop.png?raw=true)
+![3]](images/pop.png)
 
 <br></br>
 
@@ -60,11 +60,11 @@ def pop():
 
 <br></br>
 
-![](images/replace-1.png?raw=true)
+![4](images/replace-1.png)
 
 <br></br>
 
-![](images/replace-2.png?raw=true)
+![5](images/replace-2.png)
 
 <br></br>
 
@@ -87,7 +87,7 @@ def replace(old_val, new_val):
 
 <br></br>
 
-![](images/complexity.png?raw=true)
+![6](images/complexity.png)
 
 
 # Num losers
