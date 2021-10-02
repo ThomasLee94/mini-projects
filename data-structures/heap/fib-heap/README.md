@@ -135,7 +135,7 @@ def replace(old_val, new_val):
 - Note: this is why we pay attention to degrees for our fib heap, to make this operation be O(log N) we force a max number of children 
 
 - Case 1: delete min root, promote children
-    - c = O(num_children)  # degree <= log N
+    - `c = O(num_children)  # degree <= log N`
     - ΔΦ <= -1 + num_children  # remove parent, add children
     - c + ΔΦ = O(log N)
 
