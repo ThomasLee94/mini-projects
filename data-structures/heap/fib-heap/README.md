@@ -6,7 +6,7 @@ only cleanup in batches (as opposed to every pop with binary heaps)
 - It is an smart implementation of a priority queue with clever amoratised algorithm design. 
 <br></br>
 
-![](images/fib-heap.png?raw=true)
+![1](images/fib-heap.png)
 <br></br>
 
 ## Push

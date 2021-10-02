@@ -1,6 +1,6 @@
 """
 Lazy but smarter way of "cleaning" up our heap. Heap consolidation only
-happens after a heappop. Heapreplace will be implemented by splicing the
+happens after a pop. Replace will be implemented by splicing the
 heap tree and re-inserting to the end of the vector.
 
 The general consensus seems to be that fib heaps are not meant to be used in
@@ -15,6 +15,8 @@ every insertion & deletion) increases the performance -
 
 This is to say that the fib heap is a smarter implementation for clever
 amoratised algorithm design. It pays to let mess build up.
+
+potential function - https://www.youtube.com/watch?v=6_BBQWQ2HQQ
 
 Shallow & wide trees are an issue.
 
@@ -39,6 +41,7 @@ class Node:
     def add_child(self, child_node):
         if child_node.val not in self.children:
             self.children[child_node.val] = child_node
+            child_node.parent = self
 
 
 class FibHeap:
@@ -51,6 +54,12 @@ class FibHeap:
             for item in iterable:
                 self.push(item)
 
+    def peek(self):
+        if self.min_root is not None:
+            return self.min_root.val
+        else:
+            raise AssertionError
+
     def pop(self):
         # TODO: Why can we only clean up roots with the same degrees?
         # This is avoid a heap-tree structure that is shallow and wide.
@@ -62,9 +71,10 @@ class FibHeap:
             for child_key in self.min_root.keys():
                 # mark promoted orphans an non losers
                 self.min_root[child_key].loser = False
-                self.roots.append(self.min_root[child_key])
-                # dereference pointers to all children
+                self.roots[self.min_root[child_key]]
+                # dereference pointers to all children/parent
                 del self.min_root[child_key]
+                self.node_map[child_key].parent = None
 
             del self.node_map[self.min_root.val]  # del min root node
             self._clean()  # merge roots with the same degrees
@@ -84,16 +94,22 @@ class FibHeap:
 
     def replace(self, new_val, old_val):
         """This is a log n operation. """
+        # TODO: check losers
+
         # get node
         replace_node = self.node_map[old_val]
         # update the val
         replace_node.val = new_val
-        # check if there is a heap violation
-        if self._is_violated:
-            # if there is, remove the child and append it as a new root
-            parent = replace_node.parent
-            del parent[replace_node.val]
-            self.roots[replace_node.val] = replace_node
+
+        while replace_node.loser is True:
+            # check if there is a heap violation
+            if self._is_violated(replace_node.parent, replace_node):
+                # if there is, remove the child and append it as a new root
+                parent = replace_node.parent
+                del parent[replace_node.val]
+                self.roots[replace_node.val] = replace_node
+                # reassign node to parent
+                replace_node = replace_node.parent
 
     def merge(self, node1, node2):
         if node1.val < node2.val:
@@ -101,8 +117,11 @@ class FibHeap:
         else:
             node1.add_child(node2)
 
-    def _is_violated(self):
+    def _update_loser(self):
         pass
+
+    def _is_violated(self, parent, child):
+        return parent.val > child.val
 
     def _update_min_root(self):
         min_val = float("inf")
@@ -115,9 +134,6 @@ class FibHeap:
     def _clean(self):
         """merge root nodes with the same degree. Order of degree's is
         arbitrary, we will be going from left to right"""
-
-        if left == len(self.roots)-1:
-            return
 
         for root_node in self.roots.values():
             for other_root in self.roots.values():
