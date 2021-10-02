@@ -6,14 +6,14 @@ only cleanup in batches (as opposed to every pop with binary heaps)
 - It is an smart implementation of a priority queue with clever amoratised algorithm design. 
 <br></br>
 
-![](images/fib-heap.png)
+![](images/fib-heap.png?raw=true)
 <br></br>
 
 ## Push
 - We are lazy with pushes and simply add new nodes as a root node
 <br></br>
 
-![](images/push.png)
+![](images/push.png?raw=true)
 <br></br>
 
 ```python
@@ -32,7 +32,7 @@ def push(key):
 
 <br></br>
 
-![](images/pop.png)
+![](images/pop.png?raw=true)
 
 <br></br>
 
@@ -60,11 +60,11 @@ def pop():
 
 <br></br>
 
-![](images/replace-1.png)
+![](images/replace-1.png?raw=true)
 
 <br></br>
 
-![](images/replace-2.png)
+![](images/replace-2.png?raw=true)
 
 <br></br>
 
@@ -87,7 +87,7 @@ def replace(old_val, new_val):
 
 <br></br>
 
-![](images/complexity.png)
+![](images/complexity.png?raw=true)
 
 
 # Num losers
