@@ -108,43 +108,43 @@ def replace(old_val, new_val):
 
 ## Potential function for fibonacci heaps
 - The number of trees in the forest + twice the amount of marked nodes
-- Φ = num_roots + 2 * num_losers
+- `Φ = num_roots + 2 * num_losers`
 
 ## Push complexity
-- c = O(1) 
-- ΔΦ = 1  # num_roots increases by 1
-- c + ΔΦ => O(1)
+- `c = O(1)`
+- `ΔΦ = 1  # num_roots increases by 1`
+- `c + ΔΦ => O(1)`
 
 ## Replace complexity
 - Case 1: no heap violation
-    - c = O(1)
-    - ΔΦ = 0  #  heap structure does not chance
-    - c + ΔΦ = O(1)
+    - `c = O(1)`
+    - `ΔΦ = 0  #  heap structure does not change`
+    - `c + ΔΦ = O(1)`
 
 - Case 2: heap violation
     1 - promote violdated node to root:
-        - c = O(1)
-        - ΔΦ = 1  #  new root node added
-        - c + ΔΦ = O(1)
+        - `c = O(1)`
+        - `ΔΦ = 1  #  new root node added`
+        - `c + ΔΦ = O(1)`
     2 - promote double losers
-        - c = O(L)
-        - ΔΦ = +L-2L = -L
-        - c + ΔΦ = O(1)
+        - `c = O(L)`
+        - `ΔΦ = +L-2L = -L`
+        - `c + ΔΦ = O(1)`
 
 ## Pop complexity
 - Note: this is why we pay attention to degrees for our fib heap, to make this operation be O(log N) we force a max number of children 
 
 - Case 1: delete min root, promote children
     - `c = O(num_children)  # degree <= log N`
-    - ΔΦ <= -1 + num_children  # remove parent, add children
-    - c + ΔΦ = O(log N)
+    - `ΔΦ <= -1 + num_children  # remove parent, add children`
+    - `c + ΔΦ = O(log N)`
 
 - Case 2: cleanup
     - suppose we start with X trees, do M merges & end up with Y trees.
-    - c = O(X + M + log N)
+    - `c = O(X + M + log N)`
 
 - Case 3: find new min from cleaned roots (roots with equal degrees have been merged)
-    - c = O(log N) #  max degree is log N
+    - `c = O(log N) #  max degree is log N`
 
 # Shape Theorem
 
