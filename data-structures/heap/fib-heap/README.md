@@ -32,7 +32,7 @@ def push(key):
 
 <br></br>
 
-![3]](images/pop.png)
+![3](images/pop.png)
 
 <br></br>
 
