@@ -94,7 +94,7 @@ def replace(old_val, new_val):
 - 
 
 # Resources
-- Why its called a [fibonacci!](https://stackoverflow.com/a/14333315/12454155) heap
-- The [intuition & motivation!](https://stackoverflow.com/a/19508527/12454155) behind the data structure
-- Amoritised runtime analysis with the [potential function!](https://www.youtube.com/watch?v=6_BBQWQ2HQQ)
+- Why its called a [fibonacci](https://stackoverflow.com/a/14333315/12454155) heap
+- The [intuition & motivation](https://stackoverflow.com/a/19508527/12454155) behind the data structure
+- Amoritised runtime analysis with the [potential function](https://www.youtube.com/watch?v=6_BBQWQ2HQQ)
 - [Notes (pages 62-72)](https://www.cl.cam.ac.uk/teaching/2021/Algorithms/notes2.pdf)
