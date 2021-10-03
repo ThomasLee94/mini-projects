@@ -154,4 +154,5 @@ def replace(old_val, new_val):
 - The [intuition & motivation](https://stackoverflow.com/a/19508527/12454155) behind the data structure
 - Amoritised runtime analysis with the [potential function](https://www.youtube.com/watch?v=6_BBQWQ2HQQ)
 - More about amortised analysis using a [potential function](https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-046j-design-and-analysis-of-algorithms-spring-2015/lecture-notes/MIT6_046JS15_lec05.pdf) - Pages 4-6
+- [aggregate](https://www.cl.cam.ac.uk/teaching/2021/Algorithms/notes2.pdf) analysis (Pages 49-54)
 - [More notes on fibocacci heaps (pages 62-72)](https://www.cl.cam.ac.uk/teaching/2021/Algorithms/notes2.pdf)

@@ -16,8 +16,6 @@ every insertion & deletion) increases the performance -
 This is to say that the fib heap is a smarter implementation for clever
 amoratised algorithm design. It pays to let mess build up.
 
-potential function - https://www.youtube.com/watch?v=6_BBQWQ2HQQ
-
 Shallow & wide trees are an issue.
 
 [      root1      ]
@@ -36,19 +34,20 @@ class Node:
         self.parent = None
         self.children = {}
         self.loser = False
-        self.degrees = len(self.children)
+        self.degree = 0
 
     def add_child(self, child_node):
         if child_node.val not in self.children:
             self.children[child_node.val] = child_node
             child_node.parent = self
+            child_node.parent.degree += 1
 
 
 class FibHeap:
     def __init__(self, iterable=None):
         self.roots = {}  # map of all root nodes
         self.node_map = {}  # map of all nodes
-        self.min_root = None
+        self.min_root = Node(float("inf"))
 
         if iterable:
             for item in iterable:
@@ -61,24 +60,17 @@ class FibHeap:
             raise AssertionError
 
     def pop(self):
-        # TODO: Why can we only clean up roots with the same degrees?
-        # This is avoid a heap-tree structure that is shallow and wide.
-
         # dereference child pointers of min_root & promote orphans
         if self.min_root is not None:
             min_val = self.min_root.val
 
             for child_key in self.min_root.keys():
-                # mark promoted orphans an non losers
-                self.min_root[child_key].loser = False
-                self.roots[self.min_root[child_key]]
-                # dereference pointers to all children/parent
-                del self.min_root[child_key]
-                self.node_map[child_key].parent = None
+                self._remove_and_promote(self.min_root, self.node_map[child_key])
 
             del self.node_map[self.min_root.val]  # del min root node
             self._clean()  # merge roots with the same degrees
             self._update_min_root()  # find new min root
+
             return min_val  # return min val in fib heap
         else:
             raise AssertionError
@@ -93,32 +85,56 @@ class FibHeap:
             self.min_root = new_node
 
     def replace(self, new_val, old_val):
-        """This is a log n operation. """
-        # TODO: check losers
-
+        """Replace node with new val, check for heap violations
+        Splice node to root if there is a heap violation"""
         # get node
         replace_node = self.node_map[old_val]
         # update the val
         replace_node.val = new_val
 
-        while replace_node.loser is True:
-            # check if there is a heap violation
-            if self._is_violated(replace_node.parent, replace_node):
-                # if there is, remove the child and append it as a new root
-                parent = replace_node.parent
-                del parent[replace_node.val]
-                self.roots[replace_node.val] = replace_node
-                # reassign node to parent
-                replace_node = replace_node.parent
+        # check if there is a heap violation
+        if self._is_violated(replace_node.parent, replace_node):
+            self._cut(replace_node.parent, replace_node)
+            self._cascading_cut(replace_node.parent)
 
-    def merge(self, node1, node2):
+            if replace_node.parent not in self.roots:
+                replace_node.parent.loser = True
+
+    def _cut(self, parent, child):
+        """Remove child from parent & decrement degree. Promote child to root,
+        make its parent None & unmark child node to non loser"""
+        del parent[child.val]
+        parent.degree -= 1
+        child.loser = False
+
+        # promote child to root
+        self.roots[child.val] = child
+
+    def _cascading_cut(self, node):
+        """Continue cutting upward on path from the decreased node towards the root
+        until we are met with a root or non loser"""
+        parent = node.parent
+
+        if parent is not None:
+            if parent.loser is False:
+                parent.loser = True
+            else:
+                self._cut(parent, node)
+                self._cascading_cut(parent)
+
+    def _merge(self, node1, node2):
         if node1.val < node2.val:
             node2.add_child(node1)
         else:
             node1.add_child(node2)
 
-    def _update_loser(self):
-        pass
+    def _remove_and_promote(self, parent, child):
+        # mark promoted orphans an non losers
+        child.loser = False
+        self.roots[child.val] = child
+        # dereference pointers
+        child.parent = None
+        del parent[child.val]
 
     def _is_violated(self, parent, child):
         return parent.val > child.val
@@ -137,6 +153,6 @@ class FibHeap:
 
         for root_node in self.roots.values():
             for other_root in self.roots.values():
-                if root_node.degrees == other_root.degrees and root_node != other_root:
-                    self.merge(root_node, other_root)
+                if root_node.degree == other_root.degree and root_node != other_root:
+                    self._merge(root_node, other_root)
                     self._clean()
