@@ -1,4 +1,4 @@
-from binary_min_heap import heapify, heappush, heappop
+from min_heap import heapify, heappush, heappop
 
 """
                 0
@@ -12,10 +12,6 @@ def test_heap_array():
     test_array_heapify()
     test_array_heappop()
     test_array_heappush()
-
-
-def test_heap_tree():
-    pass
 
 
 def test_array_heapify():
@@ -48,4 +44,3 @@ def test_array_heappush():
 
 if __name__ == "__main__":
     test_heap_array()
-    # test_heap_tree()
