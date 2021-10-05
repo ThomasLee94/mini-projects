@@ -40,12 +40,16 @@ class Node:
         if child_node.val not in self.children:
             self.children[child_node.val] = child_node
             child_node.parent = self
-            child_node.parent.degree += 1
+            self.degree += 1
+
+    def __eq__(self, node):
+        if isinstance(node, Node):
+            return self.val == node.val and id(self) == id(node)
 
 
 class FibHeap:
     def __init__(self, iterable=None):
-        self.roots = {}  # map of all root nodes
+        self.roots = []
         self.node_map = {}  # map of all nodes
         self.min_root = Node(float("inf"))
 
@@ -54,7 +58,7 @@ class FibHeap:
                 self.push(item)
 
     def peek(self):
-        if self.min_root is not None:
+        if self.min_root is not None and self.min_root.val != float("inf"):
             return self.min_root.val
         else:
             raise AssertionError
@@ -64,10 +68,16 @@ class FibHeap:
         if self.min_root is not None:
             min_val = self.min_root.val
 
-            for child_key in self.min_root.keys():
-                self._remove_and_promote(self.min_root, self.node_map[child_key])
+            # children
+            children = self.min_root.children.values()
 
-            del self.node_map[self.min_root.val]  # del min root node
+            for child_key in self.min_root.children.keys():
+                self._remove_and_promote(self.min_root, self.min_root.children[child_key])
+
+            # del min root
+            del self.node_map[self.min_root.val]
+            del self.roots[self.min_root.val]
+
             self._clean()  # merge roots with the same degrees
             self._update_min_root()  # find new min root
 
@@ -77,7 +87,8 @@ class FibHeap:
 
     def push(self, val):
         new_node = Node(val)
-        self.roots[new_node.val] = new_node
+        # add new node to roots & node map
+        self.roots[val] = new_node
         self.node_map[val] = new_node
 
         # update min root if necessary
@@ -134,7 +145,7 @@ class FibHeap:
         self.roots[child.val] = child
         # dereference pointers
         child.parent = None
-        del parent[child.val]
+        del parent.children[child.val]
 
     def _is_violated(self, parent, child):
         return parent.val > child.val
@@ -150,9 +161,26 @@ class FibHeap:
     def _clean(self):
         """merge root nodes with the same degree. Order of degree's is
         arbitrary, we will be going from left to right"""
+        # if there is only node in all the degrees that exist, we know
+        # that there are no more nodes with the same degrees in self.roots
+        if self._roots_unique_degrees():
+            return
 
+        degrees = {}
+
+        for node in self.roots.values():
+            if node.degree in degrees:
+                self._merge(node, degrees[node.degree][0])
+            else:
+                degrees[node.degree] = [node]
+
+        for array in degrees.values():
+            if len(array) > 1:
+                self._merge(array[0], array[1])
+                self._clean()
+
+    def _roots_unique_degrees(self):
+        degrees = set()
         for root_node in self.roots.values():
-            for other_root in self.roots.values():
-                if root_node.degree == other_root.degree and root_node != other_root:
-                    self._merge(root_node, other_root)
-                    self._clean()
+            degrees.add(root_node.degree)
+        return len(self.roots) == len(degrees)
