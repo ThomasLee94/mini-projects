@@ -27,31 +27,14 @@ Degree or rank is the same as "number of children" in formal
 literature on fibonacci heaps/priority queues.
 """
 
-
-class Node:
-    def __init__(self, val):
-        self.val = val
-        self.parent = None
-        self.children = {}
-        self.loser = False
-        self.degree = 0
-
-    def add_child(self, child_node):
-        if child_node.val not in self.children:
-            self.children[child_node.val] = child_node
-            child_node.parent = self
-            self.degree += 1
-
-    def __eq__(self, node):
-        if isinstance(node, Node):
-            return self.val == node.val and id(self) == id(node)
+from fib_doubly_linked_list import DoublyLinkedList, FibNode
 
 
 class FibHeap:
     def __init__(self, iterable=None):
-        self.roots = []
+        self.roots = DoublyLinkedList()
         self.node_map = {}  # map of all nodes
-        self.min_root = Node(float("inf"))
+        self.min_root = FibNode(float("inf"))
 
         if iterable:
             for item in iterable:
@@ -68,15 +51,17 @@ class FibHeap:
         if self.min_root is not None:
             min_val = self.min_root.val
 
-            # children
             children = self.min_root.children.values()
 
-            for child_key in self.min_root.children.keys():
-                self._remove_and_promote(self.min_root, self.min_root.children[child_key])
+            for child_node in children:
+                # promote children to root
+                self._promote(child_node)
+                # dereferences parent pointer
+                self._remove(self.min_root, child_node)
 
             # del min root
             del self.node_map[self.min_root.val]
-            del self.roots[self.min_root.val]
+            self.min_root = None
 
             self._clean()  # merge roots with the same degrees
             self._update_min_root()  # find new min root
@@ -86,14 +71,13 @@ class FibHeap:
             raise AssertionError
 
     def push(self, val):
-        new_node = Node(val)
         # add new node to roots & node map
-        self.roots[val] = new_node
-        self.node_map[val] = new_node
+        self.roots.append(val)
+        self.node_map[val] = self.roots.tail
 
         # update min root if necessary
         if val < self.min_root.val:
-            self.min_root = new_node
+            self.min_root = self.roots.tail
 
     def replace(self, new_val, old_val):
         """Replace node with new val, check for heap violations
@@ -109,21 +93,22 @@ class FibHeap:
             self._cascading_cut(replace_node.parent)
 
             if replace_node.parent not in self.roots:
+                # double loser
                 replace_node.parent.loser = True
 
-    def _cut(self, parent, child):
+    def _cut(self, parent_node, child_node):
         """Remove child from parent & decrement degree. Promote child to root,
         make its parent None & unmark child node to non loser"""
-        del parent[child.val]
-        parent.degree -= 1
-        child.loser = False
+        del parent_node[child_node.val]
+        parent_node.degree -= 1
+        child_node.loser = False
 
         # promote child to root
-        self.roots[child.val] = child
+        self.roots.append(child_node)
 
     def _cascading_cut(self, node):
-        """Continue cutting upward on path from the decreased node towards the root
-        until we are met with a root or non loser"""
+        """Continue cutting upward on path from the decreased node towards
+        the root until we are met with a root or non loser"""
         parent = node.parent
 
         if parent is not None:
@@ -134,18 +119,24 @@ class FibHeap:
                 self._cascading_cut(parent)
 
     def _merge(self, node1, node2):
+        print("NODE 1 ", node1.val, "NODE 2 ", node2.val)
         if node1.val < node2.val:
             node2.add_child(node1)
+            self.roots.remove(node1)
         else:
             node1.add_child(node2)
+            self.roots.remove(node2)
 
-    def _remove_and_promote(self, parent, child):
+    def _promote(self, orphan_node):
         # mark promoted orphans an non losers
-        child.loser = False
-        self.roots[child.val] = child
+        orphan_node.loser = False
+        self.roots.append(orphan_node)
+
+    def _remove(self, parent_node, child_node):
         # dereference pointers
-        child.parent = None
-        del parent.children[child.val]
+        child_node.parent = None
+        del parent_node.children[child_node.val]
+        self.roots.remove(parent_node)
 
     def _is_violated(self, parent, child):
         return parent.val > child.val
@@ -153,34 +144,41 @@ class FibHeap:
     def _update_min_root(self):
         min_val = float("inf")
 
-        for root in self.roots.values():
-            min_val = min(min_val, root.val)
+        node = self.roots.head
+        while node is not None:
+            min_val = min(min_val, node.val)
+            node = node.next
 
         self.min_root = self.node_map[min_val]
 
     def _clean(self):
         """merge root nodes with the same degree. Order of degree's is
         arbitrary, we will be going from left to right"""
+
         # if there is only node in all the degrees that exist, we know
         # that there are no more nodes with the same degrees in self.roots
-        if self._roots_unique_degrees():
+
+        if self._has_unique_degrees_only():
             return
 
         degrees = {}
 
-        for node in self.roots.values():
+        node = self.roots.head
+        while node is not None:
             if node.degree in degrees:
                 self._merge(node, degrees[node.degree][0])
+                self._clean()
             else:
                 degrees[node.degree] = [node]
 
-        for array in degrees.values():
-            if len(array) > 1:
-                self._merge(array[0], array[1])
-                self._clean()
+        return
 
-    def _roots_unique_degrees(self):
-        degrees = set()
-        for root_node in self.roots.values():
-            degrees.add(root_node.degree)
-        return len(self.roots) == len(degrees)
+    def _has_unique_degrees_only(self):
+        unique_degrees = set()
+
+        node = self.roots.head
+        while node is not None:
+            unique_degrees.add(node.degree)
+            node = node.next
+
+        return len(self.roots) == len(unique_degrees)

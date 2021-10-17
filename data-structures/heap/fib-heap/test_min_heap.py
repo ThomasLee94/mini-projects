@@ -1,11 +1,12 @@
-from min_heap import FibHeap, Node
+from min_heap import FibHeap
+from fib_doubly_linked_list import FibNode
 import unittest
 
 
 class FibHeapTest(unittest.TestCase):
     def test_node_init(self):
-        node1 = Node(1)
-        node2 = Node(2)
+        node1 = FibNode(1)
+        node2 = FibNode(2)
 
         assert node1 != node2
         assert node1 == node1
@@ -16,6 +17,7 @@ class FibHeapTest(unittest.TestCase):
 
     def test_fib_heappop(self):
         fib_heap = FibHeap([6, 5, 4, 3, 2, 1, 0])
+        print(fib_heap.roots)
         assert fib_heap.pop() == 0
         assert fib_heap.pop() == 1
         assert fib_heap.pop() == 2
@@ -35,9 +37,6 @@ class FibHeapTest(unittest.TestCase):
         assert fib_heap.peek() == 3
         fib_heap.push(1)
         assert fib_heap.peek() == 1
-
-    # def test_fib_heapreplace(self):
-    #     pass
 
 
 if __name__ == "__main__":
